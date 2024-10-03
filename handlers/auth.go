@@ -5,7 +5,9 @@ import (
 	"merchant-bank-api/config"
 	"merchant-bank-api/models"
 	"merchant-bank-api/repository"
+	"merchant-bank-api/tokenblacklist"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -73,11 +75,17 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set token cookie to expire
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   "",
-		Expires: time.Now().Add(-time.Hour),
-	})
+	// http.SetCookie(w, &http.Cookie{
+	// 	Name:    "token",
+	// 	Value:   "",
+	// 	Expires: time.Now().Add(-time.Hour),
+	// })
+
+	// Parse the token from the Authorization header
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Add the token to the blacklist
+	tokenblacklist.AddToken(tokenString)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

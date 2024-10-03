@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"encoding/json"
 	"merchant-bank-api/config"
 	"merchant-bank-api/handlers"
+	"merchant-bank-api/tokenblacklist"
 	"net/http"
 	"strings"
 	"time"
@@ -22,6 +24,14 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 		// Parse the token from the Authorization header
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
+		// Check if the token is blacklisted
+		if tokenblacklist.IsTokenBlacklisted(tokenString) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Token is invalid"})
+			return
+		}
+
 		claims := &handlers.Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return config.JwtKey, nil
@@ -29,21 +39,29 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
-				http.Error(w, "Invalid signature", http.StatusUnauthorized)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Signature"})
 				return
 			}
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token"})
 			return
 		}
 
 		if !token.Valid {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token"})
 			return
 		}
 
 		// Check token expiration
 		if claims.ExpiresAt.Before(time.Now()) {
-			http.Error(w, "Token expired", http.StatusUnauthorized)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Token expired"})
 			return
 		}
 
