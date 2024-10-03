@@ -18,16 +18,21 @@ type Claims struct {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	var reqCustomer models.Customer
-	json.NewDecoder(r.Body).Decode(&reqCustomer)
+	if err := json.NewDecoder(r.Body).Decode(&reqCustomer); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"error": "Invalid request payload"}`, http.StatusBadRequest)
+		return
+	}
 
-	customers, _ := repository.ReadCustomers()
+	customers, err := repository.ReadCustomers()
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"error": "Error reading customers data"}`, http.StatusInternalServerError)
+		return
+	}
 
 	for _, customer := range customers {
 		if customer.Username == reqCustomer.Username && customer.Password == reqCustomer.Password {
-			// Set customer to logged in
-			customer.LoggedIn = true
-			repository.WriteCustomers(customers)
-
 			// Create JWT claims (payload)
 			expirationTime := time.Now().Add(5 * time.Minute)
 			claims := &Claims{
@@ -41,7 +46,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 			tokenString, err := token.SignedString(config.JwtKey)
 			if err != nil {
-				http.Error(w, "Could not create token", http.StatusInternalServerError)
+				w.Header().Set("Content-Type", "application/json")
+				http.Error(w, `{"error": "Could not create token"}`, http.StatusInternalServerError)
 				return
 			}
 
@@ -49,13 +55,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+
 			return
 		}
 	}
-	http.Error(w, "Customer not found or invalid credentials", http.StatusUnauthorized)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusUnauthorized)
+	json.NewEncoder(w).Encode(map[string]string{"error": "Customer not found or invalid credentials"})
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
+	// Get the Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Missing token", http.StatusUnauthorized)
+		return
+	}
+
 	// Set token cookie to expire
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
@@ -63,5 +79,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(-time.Hour),
 	})
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Logged out successfully"})
 }
