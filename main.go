@@ -19,6 +19,8 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/login", handlers.Login).Methods("POST")
+	router.HandleFunc("/register-customer", handlers.CreateCustomer).Methods("POST")
+	router.HandleFunc("/register-merchant", handlers.CreateMerchant).Methods("POST")
 	router.HandleFunc("/payment", middleware.Authenticate(handlers.Payment)).Methods("POST")
 	router.HandleFunc("/logout", middleware.Authenticate(handlers.Logout)).Methods("POST")
 

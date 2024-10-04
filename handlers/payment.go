@@ -57,7 +57,9 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 
 	// Validate amount
 	if req.Amount <= 0 {
-		http.Error(w, "Invalid amount. Must be greater than zero.", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid amount. Must be greater than zero."})
 		return
 	}
 

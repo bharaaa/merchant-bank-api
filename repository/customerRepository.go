@@ -6,8 +6,10 @@ import (
 	"os"
 )
 
+var customerFilePath = "data/customers.json"
+
 func ReadCustomers() ([]models.Customer, error) {
-	data, err := os.ReadFile("data/customers.json")
+	data, err := os.ReadFile(customerFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -17,9 +19,16 @@ func ReadCustomers() ([]models.Customer, error) {
 }
 
 func WriteCustomers(customers []models.Customer) error {
-	data, err := json.Marshal(customers)
+	data, err := json.MarshalIndent(customers, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile("data/customers.json", data, 0644)
+
+	// Write the updated data back to the file
+	err = os.WriteFile(customerFilePath, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

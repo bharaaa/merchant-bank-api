@@ -6,8 +6,10 @@ import (
 	"os"
 )
 
+var merchantFilePath = "data/merchants.json"
+
 func ReadMerchants() ([]models.Merchant, error) {
-	data, err := os.ReadFile("data/merchants.json")
+	data, err := os.ReadFile(merchantFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -20,11 +22,24 @@ func ReadMerchants() ([]models.Merchant, error) {
 }
 
 func WriteMerchants(merchants []models.Merchant) error {
-	data, err := json.Marshal(merchants)
+	// data, err := json.Marshal(merchants)
+	// if err != nil {
+	// 	return err
+	// }
+	// return os.WriteFile("data/merchants.json", data, 0644)
+
+	data, err := json.MarshalIndent(merchants, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile("data/merchants.json", data, 0644)
+
+	// Write the updated data back to the file
+	err = os.WriteFile(merchantFilePath, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func AppendMerchant(merchant models.Merchant) error {

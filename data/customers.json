@@ -1,1 +1,12 @@
-[{"id":"1","username":"alice","password":"password123","logged_in":false},{"id":"2","username":"bob","password":"securepass"},{"id":"3","username":"bob","password":"securepass"}]
+[
+  {
+    "id": "3881ffe5-9213-4af6-966c-15ce2f5ed12c",
+    "username": "yuna",
+    "password": "$2a$10$u5OMv9jMb8EJKrF2hLslk.vg6QqYpRDszv0hAY/T4TesxuBu9Hlma"
+  },
+  {
+    "id": "a54d56ea-6d90-472a-80c4-868341d15f38",
+    "username": "alice",
+    "password": "$2a$10$GekUfuxb0eQK0GaYwRsIyeD0Q1WRJijJsJhcZ.aWLgtXyDuFyUZ6y"
+  }
+]

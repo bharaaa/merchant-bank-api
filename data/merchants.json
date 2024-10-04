@@ -1,1 +1,17 @@
-[{"id":"1","name":"Merchant 1","balance":2100},{"id":"2","name":"Merchant 2","balance":1200}]
+[
+  {
+    "id": "49b6538e-b921-4163-8a7e-a72307c17e2f",
+    "name": "Merchant 3",
+    "balance": 0
+  },
+  {
+    "id": "c132f912-b4e7-4a11-8f19-6f7d777d3242",
+    "name": "Merchant 1",
+    "balance": 500
+  },
+  {
+    "id": "8b16f25e-406f-4853-b2b1-3ddaf93f060a",
+    "name": "Merchant 2",
+    "balance": 0
+  }
+]

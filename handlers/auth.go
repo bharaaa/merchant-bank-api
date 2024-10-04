@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Claims struct {
@@ -20,6 +21,8 @@ type Claims struct {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	var reqCustomer models.Customer
+
+	// Decode the request body into reqCustomer struct
 	if err := json.NewDecoder(r.Body).Decode(&reqCustomer); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, `{"error": "Invalid request payload"}`, http.StatusBadRequest)
@@ -33,9 +36,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Iterate through the customers to find matching username
 	for _, customer := range customers {
-		if customer.Username == reqCustomer.Username && customer.Password == reqCustomer.Password {
-			// Create JWT claims (payload)
+		if customer.Username == reqCustomer.Username {
+			// Compare the stored hashed password with the provided password
+			err := bcrypt.CompareHashAndPassword([]byte(customer.Password), []byte(reqCustomer.Password))
+			if err != nil {
+				// Password doesn't match
+				w.Header().Set("Content-Type", "application/json")
+				http.Error(w, `{"error": "Invalid credentials"}`, http.StatusUnauthorized)
+				return
+			}
+
+			// Password matches, proceed with generating JWT
 			expirationTime := time.Now().Add(5 * time.Minute)
 			claims := &Claims{
 				CustomerID: customer.ID,
@@ -61,6 +74,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// If no matching customer found
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
 	json.NewEncoder(w).Encode(map[string]string{"error": "Customer not found or invalid credentials"})
