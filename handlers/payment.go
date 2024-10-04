@@ -89,7 +89,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Verify if the merchant exists (assuming you provide merchant ID in the payment request)
+	// Verify if the merchant exists
 	var merchantFound bool
 	for i, merchant := range merchants {
 		if merchant.ID == req.MerchantID {
