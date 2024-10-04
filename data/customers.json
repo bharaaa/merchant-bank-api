@@ -1,1 +1,1 @@
-[{"id":"1","username":"alice","password":"password123","logged_in":false},{"id":"2","username":"bob","password":"securepass","logged_in":false},{"id":"3","username":"bob","password":"securepass","logged_in":false}]
+[{"id":"1","username":"alice","password":"password123","logged_in":false},{"id":"2","username":"bob","password":"securepass"},{"id":"3","username":"bob","password":"securepass"}]

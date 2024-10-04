@@ -1,1 +1,1 @@
-[]
+[{"customer_id":"1","merchant_id":"2","action":"payment","amount":500,"timestamp":"2024-10-04 23:32:00.532073 +0700 WIB m=+30.753345959"},{"customer_id":"2","merchant_id":"2","action":"payment","amount":500,"timestamp":"2024-10-04 23:32:58.204827 +0700 WIB m=+88.425696293"}]

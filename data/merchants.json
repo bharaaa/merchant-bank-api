@@ -1,8 +1,1 @@
-[
-  {
-    "id": "1",
-    "name": "Merchant1",
-    "balance": 0,
-    "logged_in": false
-  }
-]
+[{"id":"1","name":"Merchant 1","balance":2100},{"id":"2","name":"Merchant 2","balance":1200}]
